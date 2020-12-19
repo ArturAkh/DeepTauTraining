@@ -1,0 +1,19 @@
+executable = run_batches.sh
+output                = logging/$(ClusterId).$(ProcId).out
+error                 = logging/$(ClusterId).$(ProcId).err
+log                   = logging/$(ClusterId).$(ProcId).log
+getenv                = true
+on_exit_hold = (ExitBySignal == True) || (ExitCode != 0)
+requirements = (TARGET.ProvidesCPU == True) && (TARGET.ProvidesIO == True)
++RemoteJob = True
++RequestWalltime = 300
++ExperimentalJob = True
+RequestMemory = 2000
+RequestCpus = 1
+accounting_group = cms.higgs
+transfer_input_files = summed_info.json, binning.yaml, filelist.txt, make_batches.py
+transfer_output_files = ""
+universe = docker
+docker_image = mschnepf/slc7-condocker
+use_x509userproxy     = true
+queue arguments from arguments.txt
