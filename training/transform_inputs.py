@@ -6,14 +6,14 @@ import numpy as np
 import yaml
 import matplotlib.pyplot as plt
 
-plotting = True
+plotting = False
 
-#flist = glob.glob('/ceph/akhmet/balanced_batches/batch0/*.root')
-flist = glob.glob('/ceph/akhmet/balanced_batches/batch0/*.root')[0:3]
+flist = glob.glob('/ceph/akhmet/balanced_batches/batch0/*.root')
+#flist = glob.glob('/ceph/akhmet/balanced_batches/batch0/*.root')[0:3]
 
 transformation_dict = yaml.load(open('transformed_quantities.yaml', 'r'), Loader=yaml.FullLoader)
 
-n_pop_events = 10
+n_pop_events = 2
 tables = {}
 
 def transform_minmax(values, minval, maxval):
@@ -27,7 +27,8 @@ def safe_ratio(numerator, denominator):
 
 for f in flist:
     print(f)
-    tables[f] = ak.Table(uproot.open(f)['taus'].arrays(namedecode='utf-8'))
+    with uproot.open(f) as F:
+        tables[f] = ak.Table(F['taus'].arrays(namedecode='utf-8'))
 
 ## create a table with 10 events for each class from batch 0
 batchtable = ak.concatenate([tables[f][:n_pop_events] for f in flist])
@@ -65,21 +66,49 @@ batchtable['tau_gj_angle_diff'] *= batchtable['tau_gj_angle_diff_valid']
 batchtable['leadChargedCand_etaAtEcalEntrance_minus_tau_eta'] = batchtable['leadChargedCand_etaAtEcalEntrance'] - batchtable['tau_eta']
 
 ### creating (deta, dphi) grids; inner: 11 x 11 with size 0.02 x 0.02, outer: 21 x 21 with size 0.05 0.05
-print(batchtable['muon_eta'])
-print(batchtable['tau_eta'])
+inner_cell_size = 0.02
+n_inner_cells = 11
+inner_grid_size = inner_cell_size * n_inner_cells
+outer_cell_size = 0.05
+n_outer_cells = 21
+outer_grid_size = outer_cell_size * 21
+
+
+#TODO: make fuction for index creation, perhaps even hide in the place_matrix function
 for q in ['eta', 'phi']:
     for p in ['ele', 'muon','pfCand']:
         batchtable['%s_d%s'%(p,q)] = batchtable['%s_%s'%(p,q)] - batchtable['tau_%s'%q]
+        batchtable['inner_%s_d%s_index'%(p,q)] = ((batchtable['%s_d%s'%(p,q)]  + inner_grid_size / 2.) * 100) // (inner_cell_size * 100)
+        batchtable['inner_%s_d%s_index'%(p,q)] = (batchtable['inner_%s_d%s_index'%(p,q)] >= 0) * (batchtable['inner_%s_d%s_index'%(p,q)] <= (n_inner_cells - 1)) * batchtable['inner_%s_d%s_index'%(p,q)] \
+                                               + (batchtable['inner_%s_d%s_index'%(p,q)] < 0) * (-1.) \
+                                               + (batchtable['inner_%s_d%s_index'%(p,q)] > (n_inner_cells - 1)) * (-1.)
+        batchtable['outer_%s_d%s_index'%(p,q)] = ((batchtable['%s_d%s'%(p,q)]  + outer_grid_size / 2.) * 100) // (outer_cell_size * 100)
+        batchtable['outer_%s_d%s_index'%(p,q)] = (batchtable['outer_%s_d%s_index'%(p,q)] >= 0) * (batchtable['outer_%s_d%s_index'%(p,q)] <= (n_outer_cells - 1)) * batchtable['outer_%s_d%s_index'%(p,q)] \
+                                               + (batchtable['outer_%s_d%s_index'%(p,q)] < 0) * (-1.) \
+                                               + (batchtable['outer_%s_d%s_index'%(p,q)] > (n_outer_cells - 1)) * (-1.)
 
-print(batchtable[0]['pfCand_dphi'])
-print(batchtable[0]['pfCand_deta'])
+#TODO get place matrix via trick:
+'''
+place = (7, 5)
+place_eta = np.where(index_eta == place[0], 1, 0)
+place_phi = np.where(index_phi == place[1], 1, 0)
+place_matrix = np.tensordot(place_eta,place_phi, axes=0)
+
+place_matrix[7][5] # ---> 1 as needed
+'''
+
+print(batchtable[-1]['pfCand_deta'])
+print(batchtable[-1]['inner_pfCand_deta_index'])
+print(batchtable[-1]['outer_pfCand_deta_index'])
+print(len(batchtable[-1]['pfCand_dphi']))
 
 ## transform quantities to [0, 1] interval
 for name, interval in transformation_dict.items():
     batchtable[name] = transform_minmax(batchtable[name], interval[0], interval[1])
 
 if plotting:
-    h = plt.hist2d(batchtable[0]['pfCand_deta'], batchtable[0]['pfCand_dphi'], bins=[21,21], range=[[-0.525, 0.525], [-0.525, 0.525]])
+    #h = plt.hist2d(batchtable[-1]['pfCand_deta'], batchtable[-1]['pfCand_dphi'], bins=[21,21], range=[[-0.525, 0.525], [-0.525, 0.525]])
+    h = plt.hist2d(batchtable[-1]['pfCand_deta'], batchtable[-1]['pfCand_dphi'], bins=[11,11], range=[[-0.11, 0.11], [-0.11, 0.11]])
     plt.xlabel('$\Delta\eta$')
     plt.ylabel('$\Delta\phi$')
     plt.colorbar(h[3])
