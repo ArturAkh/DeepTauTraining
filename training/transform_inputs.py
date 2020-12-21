@@ -6,10 +6,10 @@ import numpy as np
 import yaml
 import matplotlib.pyplot as plt
 
-plotting = False
+plotting = True
 
-flist = glob.glob('/ceph/akhmet/balanced_batches/batch0/*.root')
-#flist = glob.glob('/ceph/akhmet/balanced_batches/batch0/*.root')[0:3]
+#flist = glob.glob('/ceph/akhmet/balanced_batches/batch0/*.root')
+flist = glob.glob('/ceph/akhmet/balanced_batches/batch0/*.root')[0:3]
 
 transformation_dict = yaml.load(open('transformed_quantities.yaml', 'r'), Loader=yaml.FullLoader)
 
@@ -24,6 +24,17 @@ def safe_ratio(numerator, denominator):
     denominator = denominator * nonnull_denominator + np.invert(nonnull_denominator)
     numerator *= nonnull_denominator
     return numerator / denominator
+
+
+def create_placematrix(deltaeta, deltaphi, n_cells, cell_size):
+    placematrix = None
+    return placematrix
+
+def compute_placeindex(values, n_cells, cell_size):
+    cone_size = n_cells * cell_size
+    placeindex = ((values  + cone_size / 2.) * 100) // (cell_size * 100)
+    placeindex = (placeindex >= 0) * (placeindex <= (n_cells - 1)) * placeindex - (placeindex < 0) - (placeindex > (n_cells - 1))
+    return placeindex
 
 for f in flist:
     print(f)
@@ -68,28 +79,22 @@ batchtable['leadChargedCand_etaAtEcalEntrance_minus_tau_eta'] = batchtable['lead
 ### creating (deta, dphi) grids; inner: 11 x 11 with size 0.02 x 0.02, outer: 21 x 21 with size 0.05 0.05
 inner_cell_size = 0.02
 n_inner_cells = 11
-inner_grid_size = inner_cell_size * n_inner_cells
 outer_cell_size = 0.05
 n_outer_cells = 21
-outer_grid_size = outer_cell_size * 21
 
 
 #TODO: make fuction for index creation, perhaps even hide in the place_matrix function
 for q in ['eta', 'phi']:
     for p in ['ele', 'muon','pfCand']:
         batchtable['%s_d%s'%(p,q)] = batchtable['%s_%s'%(p,q)] - batchtable['tau_%s'%q]
-        batchtable['inner_%s_d%s_index'%(p,q)] = ((batchtable['%s_d%s'%(p,q)]  + inner_grid_size / 2.) * 100) // (inner_cell_size * 100)
-        batchtable['inner_%s_d%s_index'%(p,q)] = (batchtable['inner_%s_d%s_index'%(p,q)] >= 0) * (batchtable['inner_%s_d%s_index'%(p,q)] <= (n_inner_cells - 1)) * batchtable['inner_%s_d%s_index'%(p,q)] \
-                                               + (batchtable['inner_%s_d%s_index'%(p,q)] < 0) * (-1.) \
-                                               + (batchtable['inner_%s_d%s_index'%(p,q)] > (n_inner_cells - 1)) * (-1.)
-        batchtable['outer_%s_d%s_index'%(p,q)] = ((batchtable['%s_d%s'%(p,q)]  + outer_grid_size / 2.) * 100) // (outer_cell_size * 100)
-        batchtable['outer_%s_d%s_index'%(p,q)] = (batchtable['outer_%s_d%s_index'%(p,q)] >= 0) * (batchtable['outer_%s_d%s_index'%(p,q)] <= (n_outer_cells - 1)) * batchtable['outer_%s_d%s_index'%(p,q)] \
-                                               + (batchtable['outer_%s_d%s_index'%(p,q)] < 0) * (-1.) \
-                                               + (batchtable['outer_%s_d%s_index'%(p,q)] > (n_outer_cells - 1)) * (-1.)
+        batchtable['inner_%s_d%s_index'%(p,q)] = compute_placeindex(batchtable['%s_d%s'%(p,q)], n_inner_cells, inner_cell_size)
+        batchtable['outer_%s_d%s_index'%(p,q)] = compute_placeindex(batchtable['%s_d%s'%(p,q)], n_outer_cells, outer_cell_size)
 
 #TODO get place matrix via trick:
 '''
 place = (7, 5)
+index_eta = np.arange(0, 12)
+index_phi = np.arange(0, 12)
 place_eta = np.where(index_eta == place[0], 1, 0)
 place_phi = np.where(index_phi == place[1], 1, 0)
 place_matrix = np.tensordot(place_eta,place_phi, axes=0)
@@ -101,6 +106,7 @@ print(batchtable[-1]['pfCand_deta'])
 print(batchtable[-1]['inner_pfCand_deta_index'])
 print(batchtable[-1]['outer_pfCand_deta_index'])
 print(len(batchtable[-1]['pfCand_dphi']))
+print(np.sum((batchtable[-1]['inner_pfCand_deta_index'] >= 0.0) * (batchtable[-1]['inner_pfCand_dphi_index'] >= 0.0) ))
 
 ## transform quantities to [0, 1] interval
 for name, interval in transformation_dict.items():
