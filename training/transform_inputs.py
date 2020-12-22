@@ -6,14 +6,14 @@ import numpy as np
 import yaml
 import matplotlib.pyplot as plt
 
-plotting = True
+plotting = False
 
-#flist = glob.glob('/ceph/akhmet/balanced_batches/batch0/*.root')
-flist = glob.glob('/ceph/akhmet/balanced_batches/batch0/*.root')[0:3]
+flist = glob.glob('/ceph/akhmet/balanced_batches/batch0/*.root')
+#flist = glob.glob('/ceph/akhmet/balanced_batches/batch0/*.root')[0:3]
 
 transformation_dict = yaml.load(open('transformed_quantities.yaml', 'r'), Loader=yaml.FullLoader)
 
-n_pop_events = 2
+n_pop_events = 10
 tables = {}
 
 def transform_minmax(values, minval, maxval):
@@ -25,16 +25,41 @@ def safe_ratio(numerator, denominator):
     numerator *= nonnull_denominator
     return numerator / denominator
 
-
-def create_placematrix(deltaeta, deltaphi, n_cells, cell_size):
-    placematrix = None
-    return placematrix
-
 def compute_placeindex(values, n_cells, cell_size):
     cone_size = n_cells * cell_size
     placeindex = ((values  + cone_size / 2.) * 100) // (cell_size * 100)
     placeindex = (placeindex >= 0) * (placeindex <= (n_cells - 1)) * placeindex - (placeindex < 0) - (placeindex > (n_cells - 1))
     return placeindex
+
+def create_placematrix(deltaeta, deltaphi, n_cells):
+    ones = deltaphi.ones_like()
+    index_array = ones * 0.0
+    deltaphi_place = deltaphi
+
+    for i in np.arange(1,n_cells):
+        index_array = index_array.zip(ones * i)
+        deltaphi_place = deltaphi_place.zip(deltaphi)
+
+    index_array = ak.fromiter(index_array.flattentuple().tolist())
+    deltaphi_place = ak.fromiter(deltaphi_place.flattentuple().tolist())
+    deltaphi_place = (index_array == deltaphi_place) * 1.0
+
+    ones_array = deltaphi_place.ones_like()
+    deltaeta_place_array = ones_array * deltaeta
+
+    deltaeta_place_matrix = ((ones_array * 0.0) == deltaeta_place_array) * 1.0
+    deltaphi_place_matrix = deltaphi_place
+
+    for i in np.arange(1,n_cells):
+        added = ((ones_array * i) == deltaeta_place_array) * 1.0
+        deltaeta_place_matrix = deltaeta_place_matrix.zip(added)
+        deltaphi_place_matrix = deltaphi_place_matrix.zip(deltaphi_place)
+
+    deltaeta_place_matrix = ak.fromiter(deltaeta_place_matrix.flattentuple().tolist())
+    deltaphi_place_matrix = ak.fromiter(deltaphi_place_matrix.flattentuple().tolist())
+
+    placematrix = deltaeta_place_matrix * deltaphi_place_matrix
+    return placematrix
 
 for f in flist:
     print(f)
@@ -82,39 +107,23 @@ n_inner_cells = 11
 outer_cell_size = 0.05
 n_outer_cells = 21
 
-
-#TODO: make fuction for index creation, perhaps even hide in the place_matrix function
 for q in ['eta', 'phi']:
     for p in ['ele', 'muon','pfCand']:
         batchtable['%s_d%s'%(p,q)] = batchtable['%s_%s'%(p,q)] - batchtable['tau_%s'%q]
         batchtable['inner_%s_d%s_index'%(p,q)] = compute_placeindex(batchtable['%s_d%s'%(p,q)], n_inner_cells, inner_cell_size)
         batchtable['outer_%s_d%s_index'%(p,q)] = compute_placeindex(batchtable['%s_d%s'%(p,q)], n_outer_cells, outer_cell_size)
 
-#TODO get place matrix via trick:
-'''
-place = (7, 5)
-index_eta = np.arange(0, 12)
-index_phi = np.arange(0, 12)
-place_eta = np.where(index_eta == place[0], 1, 0)
-place_phi = np.where(index_phi == place[1], 1, 0)
-place_matrix = np.tensordot(place_eta,place_phi, axes=0)
-
-place_matrix[7][5] # ---> 1 as needed
-'''
-
-print(batchtable[-1]['pfCand_deta'])
-print(batchtable[-1]['inner_pfCand_deta_index'])
-print(batchtable[-1]['outer_pfCand_deta_index'])
-print(len(batchtable[-1]['pfCand_dphi']))
-print(np.sum((batchtable[-1]['inner_pfCand_deta_index'] >= 0.0) * (batchtable[-1]['inner_pfCand_dphi_index'] >= 0.0) ))
+for p in ['ele', 'muon','pfCand']:
+    batchtable['inner_%s_placematrix'%p] = create_placematrix(batchtable['inner_%s_deta_index'%p],batchtable['inner_%s_dphi_index'%p],n_inner_cells)
+    batchtable['outer_%s_placematrix'%p] = create_placematrix(batchtable['outer_%s_deta_index'%p],batchtable['outer_%s_dphi_index'%p],n_outer_cells)
 
 ## transform quantities to [0, 1] interval
 for name, interval in transformation_dict.items():
     batchtable[name] = transform_minmax(batchtable[name], interval[0], interval[1])
 
 if plotting:
-    #h = plt.hist2d(batchtable[-1]['pfCand_deta'], batchtable[-1]['pfCand_dphi'], bins=[21,21], range=[[-0.525, 0.525], [-0.525, 0.525]])
-    h = plt.hist2d(batchtable[-1]['pfCand_deta'], batchtable[-1]['pfCand_dphi'], bins=[11,11], range=[[-0.11, 0.11], [-0.11, 0.11]])
+    h = plt.hist2d(batchtable[-1]['pfCand_deta'], batchtable[-1]['pfCand_dphi'], bins=[21,21], range=[[-0.525, 0.525], [-0.525, 0.525]])
+    #h = plt.hist2d(batchtable[-1]['pfCand_deta'], batchtable[-1]['pfCand_dphi'], bins=[11,11], range=[[-0.11, 0.11], [-0.11, 0.11]])
     plt.xlabel('$\Delta\eta$')
     plt.ylabel('$\Delta\phi$')
     plt.colorbar(h[3])
