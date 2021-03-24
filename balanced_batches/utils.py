@@ -80,7 +80,7 @@ def create_parser(mode=None):
     parser.add_argument('--prodcampaign', required=True, help='TauTuple production campaign. Used to strip off the input path.')
     if mode == 'fileinfo':
         parser.add_argument('--ptabsetabins', required=True, help='Configuration .yaml file with settings for pt and abs(eta) bins.')
-        parser.add_argument('--inputfile', required=True, help='input TauTuple ROOT file.')
+        parser.add_argument('--filelist', required=True, nargs='+', help='input TauTuple ROOT files.')
         parser.add_argument('--job', required=True, type=int, help= 'Index of the job processed.')
     #parser.add_argument('--filelist', required=True, help='Filelist .txt file for input TauTuple files.')
     #parser.add_argument('--countinfo', required=True, help='Information .json file with counts for (pt, abs(eta), type) selections of Taus.')
