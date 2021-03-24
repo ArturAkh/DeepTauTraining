@@ -19,7 +19,7 @@ if __name__ == '__main__':
     selections = create_selections(args.ptabsetabins)
 
     info = {}
-    for inputfile in args.filelist:
+    for inputfile in args.inputfiles:
         filename = inputfile[inputfile.find(args.prodcampaign):].replace('/crab_output','')
         info[filename] = {}
 
