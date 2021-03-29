@@ -2,6 +2,7 @@
 
 import os
 import json
+import numpy as np
 from multiprocessing import Pool
 
 from utils import create_parser
@@ -45,6 +46,9 @@ if __name__ == '__main__':
         p = Pool(args.parallel)
         exitcodes = p.map(check_inputs_job, info_list)
         print("Exitcodes from jobs:",exitcodes)
+        if np.sum(exitcodes) > 0:
+            print(f'ERROR: Computation failed for at least one job!')
+            exit(1)
 
     aggregated_info = {}
 
