@@ -16,11 +16,11 @@ if __name__ == '__main__':
     parser = create_parser(mode='fileinfo')
     args = parser.parse_args()
 
-    selections = create_selections(args.ptabsetabins)
+    selections = create_selections(args.pt_abseta_bins)
 
     info = {}
-    for inputfile in args.inputfiles:
-        filename = inputfile[inputfile.find(args.prodcampaign):].replace('/crab_output','')
+    for inputfile in args.input_files:
+        filename = inputfile[inputfile.find(args.prod_campaign):].replace('/crab_output','')
         info[filename] = {}
 
         for proc in processes:
