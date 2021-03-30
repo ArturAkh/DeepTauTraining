@@ -9,7 +9,7 @@ from utils import create_parser
 
 def check_inputs_job(info):
     files = ' '.join(info['files'])
-    cmd = f"python check_inputs.py --pt-abseta-bins {info['binning']} --input-files {files} --prod-campaign {info['campaign']} --job {info['jobindex']}"
+    cmd = f"python check_inputs.py --pt-abseta-bins {info['binning']} --input-files {files} --prod-campaign {info['campaign']} --job {info['jobindex']} --process-types {info['process-types']}"
     return os.WEXITSTATUS(os.system(cmd))
     
 
@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
     parser = create_parser(mode='filedatabase')
     args = parser.parse_args()
-    old_prefix, new_prefix = args.replace_file_prefix.split(':')
+    old_prefix, new_prefix = args.replace_file_prefix.split('@')
 
     flist = open(args.input_file_list,'r')
     filelist = [f.strip().replace(old_prefix,new_prefix) for f in flist.readlines()]
@@ -32,6 +32,7 @@ if __name__ == '__main__':
         info['jobindex'] = jobindex
         info['files'] = poplist
         info['binning'] = args.pt_abseta_bins
+        info['process-types'] = args.process_types
         info['campaign'] = args.prod_campaign
         info_list.append(info)
         jobindex += 1
@@ -39,6 +40,7 @@ if __name__ == '__main__':
     info['jobindex'] = jobindex
     info['files'] = filelist
     info['binning'] = args.pt_abseta_bins
+    info['process-types'] = args.process_types
     info['campaign'] = args.prod_campaign
     info_list.append(info)
 

@@ -4,7 +4,7 @@ import json
 import yaml
 import numpy as np
 
-from utils import create_parser
+from utils import create_parser, pileup
 
 if __name__ == '__main__':
 
@@ -27,16 +27,23 @@ if __name__ == '__main__':
     json.dump(summary_info, open('summary.json','w'), sort_keys=True, indent=4)
 
     process_types = yaml.load(open(args.process_types, 'r'), Loader=yaml.FullLoader)
+    pulist = pileup if args.pileup == 'all' else [args.pileup]
+
     minima = []
     maxima = []
+    filesforselectiondatabase = {}
+
     for p in process_types.keys():
-        if args.pileup != 'all':
-            prockey = '_'.join([p,args.pileup])
+        for pu in pulist:
+            prockey = '_'.join([p,pu]) if pu != 'none' else p
             ptabsbetabins = summary_info.get(prockey)
             if ptabsbetabins:
                 chosen_ptabsbetabins = [(k,v) for k,v in ptabsbetabins.items() if k.split('_')[0] in process_types[p]['active_types']]
                 minima.append((prockey, chosen_ptabsbetabins[np.argmin([v for k,v in chosen_ptabsbetabins])]))
                 maxima.append((prockey, chosen_ptabsbetabins[np.argmax([v for k,v in chosen_ptabsbetabins])]))
+                filesforselectiondatabase[prockey] = {}
+                for b in ptabsbetabins:
+                    filesforselectiondatabase[prockey][b] = []
     
     print('Minima per process:')
     for pm in minima:
@@ -53,12 +60,10 @@ if __name__ == '__main__':
     print('Total maximum:',total_maximum)
     print('Number of max/min batches:',n_minmax_batches)
     
-    n_ptabsetabins = int(len(summary_info[total_minimum[0]].keys()) / 4)
-    n_proctypes = np.sum([len(v['active_types']) for k,v in process_types.items() if summary_info.get('_'.join([k,args.pileup]))])
-    n_events_per_minmax_batch = total_minimum[1][1] * n_ptabsetabins * n_proctypes
-    print('Number of events per max/min batch:',n_events_per_minmax_batch)
-
-    filesforselectiondatabase = {}
+    if args.pileup in pileup:
+        n_ptabsetabins = int(len(summary_info[total_minimum[0]].keys()) / 4)
+        n_proctypes = np.sum([len(v['active_types']) for k,v in process_types.items() if summary_info.get('_'.join([k,args.pileup]))])
+        n_events_per_minmax_batch = total_minimum[1][1] * n_ptabsetabins * n_proctypes
+        print('Number of events per max/min batch:',n_events_per_minmax_batch)
     
-
     jobdatabase = {}

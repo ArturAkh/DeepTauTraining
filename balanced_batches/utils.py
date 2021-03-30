@@ -61,8 +61,7 @@ def create_selections(ptabsetabinsfile):
 def create_parser(mode=None):
     parser = argparse.ArgumentParser(description='Create batches with equal number of entries per selection of Taus.')
     parser.add_argument('--prod-campaign', required=True, help='TauTuple production campaign. Used to strip off the input path.')
-    if mode in ['fileinfo','jobdatabase']:
-        parser.add_argument('--process-types', required=True, help='Configuration .yaml file with settings, which types use for which process.')
+    parser.add_argument('--process-types', required=True, help='Configuration .yaml file with settings, which types use for which process.')
     if mode in ['fileinfo','filedatabase']:
         parser.add_argument('--pt-abseta-bins', required=True, help='Configuration .yaml file with settings for pt and abs(eta) bins.')
         if mode == 'fileinfo':
@@ -74,8 +73,7 @@ def create_parser(mode=None):
             parser.add_argument('--files-per-job', type=int, default=20, help= 'Number of files to be checked per job. Default: %(default)s')
             parser.add_argument('--replace-file-prefix', default=':', help='Prefix of file path to be replaced, to be used in the following "<old-prefix>:<new-prefix>". Default: %(default)s')
             parser.add_argument('--recompute-infos', action='store_true', help='To be used in case .json output files with "counts_job_*.json" are not available yet.')
-            parser.add_argument('--process-types', required=True, help='Configuration .yaml file with settings, which types use for which process.')
     elif mode == 'jobdatabase':
-        parser.add_argument('--pileup', required=True, choices=['NoPU', 'PU140', 'PU200', 'all'], help='Which pileup scenarios to be used for training based on balanced batches.')
+        parser.add_argument('--pileup', required=True, choices=['NoPU', 'PU140', 'PU200', 'all', 'none'], help='Which explicit pileup scenarios to be used for training based on balanced batches.')
         parser.add_argument('--events-per-batch-type', required=True, type=int, help='Number of events per individual batch-type (process x tautype x ptabsetabin)')
     return parser

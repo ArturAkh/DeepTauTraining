@@ -6,10 +6,10 @@ ElecGun:
     regex: '(Double|Single)Electron'
 MuonGun:
     active_types: ['muon']
-# remove, since only low populated
-#MinBias:
-#    active_types: ['jet']
-#    regex: 'MinBias'
+    regex: 'DoubleMuon|Muplus|Muminus'
+MinBias:
+    active_types: ['jet']
+    regex: 'MinBias'
 QCD:
     active_types: ['jet']
     regex: 'QCD'

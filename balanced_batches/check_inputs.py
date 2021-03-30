@@ -24,6 +24,7 @@ if __name__ == '__main__':
     for inputfile in args.input_files:
         filename = inputfile[inputfile.find(args.prod_campaign):].replace('/crab_output','')
         info[filename] = {}
+        info[filename]['path'] = inputfile
 
         for proc in processes:
             if re.search(processes[proc]['regex'],filename):
