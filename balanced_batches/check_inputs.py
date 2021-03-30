@@ -2,13 +2,14 @@
 
 import json
 import re
+import yaml
 
 import numpy as np
 import ROOT as r
 r.gROOT.SetBatch()
 r.gROOT.ProcessLine('gErrorIgnoreLevel = 2001;')
 
-from utils import types, pileup, processes
+from utils import types, pileup 
 from utils import create_selections, create_parser
 
 if __name__ == '__main__':
@@ -17,6 +18,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     selections = create_selections(args.pt_abseta_bins)
+    processes = yaml.load(open(args.process_types, 'r'), Loader=yaml.FullLoader)
 
     info = {}
     for inputfile in args.input_files:
@@ -24,7 +26,7 @@ if __name__ == '__main__':
         info[filename] = {}
 
         for proc in processes:
-            if re.search(processes[proc],filename):
+            if re.search(processes[proc]['regex'],filename):
                 info[filename]['process'] = proc
                 break
 

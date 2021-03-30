@@ -1,0 +1,45 @@
+DY:
+    active_types: ['genuine', 'jet', 'electron', 'muon']
+    regex: 'DYToLL'
+ElecGun:
+    active_types: ['electron']
+    regex: '(Double|Single)Electron'
+MuonGun:
+    active_types: ['muon']
+# remove, since only low populated
+#MinBias:
+#    active_types: ['jet']
+#    regex: 'MinBias'
+QCD:
+    active_types: ['jet']
+    regex: 'QCD'
+TTTo2L2Nu:
+    active_types: ['genuine', 'jet', 'electron', 'muon']
+    regex: 'TTTo2L2Nu'
+TTToSemiLepton:
+    active_types: ['genuine', 'jet', 'electron', 'muon']
+    regex: 'TTToSemiLepton'
+TT:
+    active_types: ['genuine', 'jet', 'electron', 'muon']
+    regex: 'TT_'
+VBF:
+    active_types: ['genuine', 'jet']
+    regex: 'VBFHToTauTau'
+WJets:
+    active_types: ['jet']
+    regex: 'WJetsToLNu'
+ZprimeToEE_M-6000:
+    active_types: ['jet', 'electron']
+    regex: 'ZprimeToEE_M-6000'
+ZprimeToMuMu_M-6000:
+    active_types: ['jet', 'muon']
+    regex: 'ZprimeToMuMu_M-6000'
+ZprimeToTauTau_M-1500:
+    active_types: ['genuine']
+    regex: 'ZprimeToTauTau_M-1500'
+ZprimeToTauTau_M-500:
+    active_types: ['genuine']
+    regex: 'ZprimeToTauTau_M-500'
+ggH:
+    active_types: ['genuine', 'jet']
+    regex: 'GluGluHToTauTau'

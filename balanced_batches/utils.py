@@ -5,23 +5,6 @@ import argparse
 
 types = ['electron', 'muon', 'jet', 'genuine']
 pileup = ['NoPU', 'PU140', 'PU200']
-processes = {
-    'DY' : 'DYToLL',
-    'WJets' : 'WJetsToLNu',
-    'ElecGun' : '(Double|Single)Electron',
-    'MuonGun' : '(DoubleMuon|Muminus|Muplus)',
-    'ggH' : 'GluGluHToTauTau',
-    'VBFH' : 'VBFHToTauTau',
-    'MinBias' : 'MinBias',
-    'QCD' : 'QCD',
-    'TTTo2L2Nu' : 'TTTo2L2Nu',
-    'TTToSemiLepton' : 'TTToSemiLepton',
-    'TT' : 'TT_',
-    'ZprimeToEE_M-6000' : 'ZprimeToEE_M-6000',
-    'ZprimeToMuMu_M-6000' : 'ZprimeToMuMu_M-6000',
-    'ZprimeToTauTau_M-500' : 'ZprimeToTauTau_M-500',
-    'ZprimeToTauTau_M-1500' : 'ZprimeToTauTau_M-1500',
-}
 
 def construct_binning(binning_structure):
     bins = np.concatenate([np.arange(start, end, step) for start, end, step in binning_structure] + [np.array([binning_structure[-1][1]])])
@@ -78,6 +61,8 @@ def create_selections(ptabsetabinsfile):
 def create_parser(mode=None):
     parser = argparse.ArgumentParser(description='Create batches with equal number of entries per selection of Taus.')
     parser.add_argument('--prod-campaign', required=True, help='TauTuple production campaign. Used to strip off the input path.')
+    if mode in ['fileinfo','jobdatabase']:
+        parser.add_argument('--process-types', required=True, help='Configuration .yaml file with settings, which types use for which process.')
     if mode in ['fileinfo','filedatabase']:
         parser.add_argument('--pt-abseta-bins', required=True, help='Configuration .yaml file with settings for pt and abs(eta) bins.')
         if mode == 'fileinfo':
@@ -89,9 +74,8 @@ def create_parser(mode=None):
             parser.add_argument('--files-per-job', type=int, default=20, help= 'Number of files to be checked per job. Default: %(default)s')
             parser.add_argument('--replace-file-prefix', default=':', help='Prefix of file path to be replaced, to be used in the following "<old-prefix>:<new-prefix>". Default: %(default)s')
             parser.add_argument('--recompute-infos', action='store_true', help='To be used in case .json output files with "counts_job_*.json" are not available yet.')
-    #parser.add_argument('--filelist', required=True, help='Filelist .txt file for input TauTuple files.')
-    #parser.add_argument('--countinfo', required=True, help='Information .json file with counts for (pt, abs(eta), type) selections of Taus.')
-    #parser.add_argument('--selectionlist', required=True, help= 'Name list of selections (separated by comma) to be used to create batches.')
-    #parser.add_argument('--job', required=True, type=int, help= 'Index of the job processed.')
-    #parser.add_argument('--batchsize', required=True, type=int, help= 'Batch size to be created for each selection. If too big, a minimum corresponding to a selection is taken.')
+            parser.add_argument('--process-types', required=True, help='Configuration .yaml file with settings, which types use for which process.')
+    elif mode == 'jobdatabase':
+        parser.add_argument('--pileup', required=True, choices=['NoPU', 'PU140', 'PU200', 'all'], help='Which pileup scenarios to be used for training based on balanced batches.')
+        parser.add_argument('--events-per-batch-type', required=True, type=int, help='Number of events per individual batch-type (process x tautype x ptabsetabin)')
     return parser
