@@ -8,7 +8,7 @@ MuonGun:
     active_types: ['muon']
     regex: 'DoubleMuon|Muplus|Muminus'
 MinBias:
-    active_types: ['jet']
+    active_types: [] # removed, since low populated
     regex: 'MinBias'
 QCD:
     active_types: ['jet']

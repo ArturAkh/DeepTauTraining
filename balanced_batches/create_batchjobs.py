@@ -19,7 +19,7 @@ if __name__ == '__main__':
     for fpath,finfo in counts.items():
         identifier = '_'.join([finfo['process'],finfo['pileup']])
         summary_info.setdefault(identifier,{})
-        ptabsetabins = [(k,v) for k,v in finfo.items() if not k in ['process','pileup']]
+        ptabsetabins = [(k,v) for k,v in finfo.items() if not k in ['process','pileup','path']]
         for k,v in ptabsetabins:
             summary_info[identifier].setdefault(k,0)
             summary_info[identifier][k] += v
@@ -39,11 +39,12 @@ if __name__ == '__main__':
             ptabsbetabins = summary_info.get(prockey)
             if ptabsbetabins:
                 chosen_ptabsbetabins = [(k,v) for k,v in ptabsbetabins.items() if k.split('_')[0] in process_types[p]['active_types']]
-                minima.append((prockey, chosen_ptabsbetabins[np.argmin([v for k,v in chosen_ptabsbetabins])]))
-                maxima.append((prockey, chosen_ptabsbetabins[np.argmax([v for k,v in chosen_ptabsbetabins])]))
-                filesforselectiondatabase[prockey] = {}
-                for b in ptabsbetabins:
-                    filesforselectiondatabase[prockey][b] = []
+                if len(chosen_ptabsbetabins) > 0:
+                    minima.append((prockey, chosen_ptabsbetabins[np.argmin([v for k,v in chosen_ptabsbetabins])]))
+                    maxima.append((prockey, chosen_ptabsbetabins[np.argmax([v for k,v in chosen_ptabsbetabins])]))
+                    filesforselectiondatabase[prockey] = {}
+                    for b in ptabsbetabins:
+                        filesforselectiondatabase[prockey][b] = []
     
     print('Minima per process:')
     for pm in minima:
