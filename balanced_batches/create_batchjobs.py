@@ -34,7 +34,7 @@ if __name__ == '__main__':
             prockey = '_'.join([p,args.pileup])
             ptabsbetabins = summary_info.get(prockey)
             if ptabsbetabins:
-                chosen_ptabsbetabins = [(k,v) for k,v in ptabsbetabins.items() if k.split('_')[0] in process_types[p]]
+                chosen_ptabsbetabins = [(k,v) for k,v in ptabsbetabins.items() if k.split('_')[0] in process_types[p]['active_types']]
                 minima.append((prockey, chosen_ptabsbetabins[np.argmin([v for k,v in chosen_ptabsbetabins])]))
                 maxima.append((prockey, chosen_ptabsbetabins[np.argmax([v for k,v in chosen_ptabsbetabins])]))
     
@@ -54,8 +54,11 @@ if __name__ == '__main__':
     print('Number of max/min batches:',n_minmax_batches)
     
     n_ptabsetabins = int(len(summary_info[total_minimum[0]].keys()) / 4)
-    n_proctypes = np.sum([len(types) for key,types in process_types.items() if summary_info.get('_'.join([key,args.pileup]))])
+    n_proctypes = np.sum([len(v['active_types']) for k,v in process_types.items() if summary_info.get('_'.join([k,args.pileup]))])
     n_events_per_minmax_batch = total_minimum[1][1] * n_ptabsetabins * n_proctypes
     print('Number of events per max/min batch:',n_events_per_minmax_batch)
+
+    filesforselectiondatabase = {}
+    
 
     jobdatabase = {}
