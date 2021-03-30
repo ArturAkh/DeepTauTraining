@@ -66,5 +66,16 @@ if __name__ == '__main__':
         n_proctypes = np.sum([len(v['active_types']) for k,v in process_types.items() if summary_info.get('_'.join([k,args.pileup]))])
         n_events_per_minmax_batch = total_minimum[1][1] * n_ptabsetabins * n_proctypes
         print('Number of events per max/min batch:',n_events_per_minmax_batch)
+
+    for finfo in counts.values():
+        prockey = None
+        if finfo['pileup'] in pulist:
+            prockey = '_'.join([finfo['process'],finfo['pileup']])
+        elif pulist == ['none']:
+            prockey = finfo['process']
+        if prockey in filesforselectiondatabase:
+            for key,value in [(k,v) for k,v in finfo.items() if not k in ['process','pileup','path'] and v > 0 and k.split('_')[0] in process_types[finfo['process']]['active_types']]:
+                filesforselectiondatabase[prockey][key].append({'path' : finfo['path'], 'nevents' : value})
     
+    json.dump(filesforselectiondatabase, open('filesforselection.json','w'), sort_keys=True, indent=4)
     jobdatabase = {}
