@@ -76,4 +76,5 @@ def create_parser(mode=None):
     elif mode == 'jobdatabase':
         parser.add_argument('--pileup', required=True, choices=['NoPU', 'PU140', 'PU200', 'all', 'none'], help='Which explicit pileup scenarios to be used for training based on balanced batches.')
         parser.add_argument('--events-per-batch-type', required=True, type=int, help='Number of events per individual batch-type (process x tautype x ptabsetabin)')
+        parser.add_argument('--jobconfigs-directory', required=True, help='Absolute path to the directory, where to put configuration files for each job.')
     return parser
