@@ -25,9 +25,6 @@ if not os.path.exists(binningfile):
 
 selections = create_selections(binningfile)
 
-opts = r.RDF.RSnapshotOptions()
-opts.fLazy = True
-
 for prockey in [k for k in jobconf if not k in ['binning','jobindex']]:
     for selname in jobconf[prockey]:
         fname = '_'.join([prockey,selname,f"batch{jobconf['jobindex']}.root"])
