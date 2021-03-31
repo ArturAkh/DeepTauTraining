@@ -95,7 +95,7 @@ if __name__ == '__main__':
 
     for jobindex in range(n_batches):
         print(f'Creating job: {jobindex}')
-        jobdatabase = {}
+        jobdatabase = {'binning' : args.pt_abseta_bins, 'jobindex': jobindex}
         for prockey in filesforselectiondatabase:
             jobdatabase[prockey] = {}
             for selection in filesforselectiondatabase[prockey]:
