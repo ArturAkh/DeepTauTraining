@@ -134,3 +134,6 @@ if __name__ == '__main__':
     with open('additional_environment.sh','w') as out:
         out.write('\n'.join(envcontent))
         out.close()
+
+    print('Creating htcondor folder for logging')
+    os.makedirs('logging', exist_ok = True)
