@@ -7,10 +7,8 @@ JOBID=$(basename ${JOBCONFIG})
 JOBID=${JOBID/job_/}
 JOBID=${JOBID/.json/}
 
-echo "Performing job with configuration ${JOBCONFIG} with job ID ${JOBID}"
-
 python make_batches.py ${JOBCONFIG}
 
 echo "Merging outputs together"
 
-hadd batch${JOBID}.root *_batch${JOBID}.root
+hadd -f batch${JOBID}.root *_batch${JOBID}.root

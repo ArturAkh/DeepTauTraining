@@ -37,7 +37,6 @@ def main():
             p = Process(target=create_output_for_batch_type, args=(fname, selections[selname], jobconf[prockey][selname]['files'], jobconf[prockey][selname]['range']))
             p.start()
             p.join()
-            #create_output_for_batch_type(info)
 
     print('Batch creation finished', datetime.datetime.now())
 
