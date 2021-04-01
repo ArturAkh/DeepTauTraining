@@ -129,8 +129,6 @@ if __name__ == '__main__':
         out.write('\n'.join(confignames))
     print('Saving required environment variables in a .sh file to be sourced.')
     envcontent = []
-    envcontent.append(f'export BALANCED_BATCHES_BATCHSYSTEM={args.batch_system}')
-    print(f"\tBALANCED_BATCHES_BATCHSYSTEM = {args.batch_system}")
     envcontent.append(f'export BALANCED_BATCHES_OUTPUTDIR={args.output_directory}')
     print(f"\tBALANCED_BATCHES_OUTPUTDIR = {args.output_directory}")
     with open('additional_environment.sh','w') as out:
