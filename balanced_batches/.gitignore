@@ -1,4 +1,6 @@
 *.root
 *.json
+*.txt
+__pycache__
 
 !.gitignore
