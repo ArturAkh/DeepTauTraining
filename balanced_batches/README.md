@@ -35,7 +35,7 @@ git clone git@github.com:ArturAkh/DeepTauTraining.git
 To setup the required environment, you need to execute the following commands:
 
 ```bash
-cd  DeepTauTraining/balanced_batches
+cd DeepTauTraining/balanced_batches
 
 # Currently (01.04.2021) latest `python3`-based software stack with `ROOT`
 source /cvmfs/sft.cern.ch/lcg/views/LCG_99/x86_64-centos7-gcc10-opt/setup.sh
