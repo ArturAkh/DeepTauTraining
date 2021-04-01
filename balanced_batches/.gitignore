@@ -3,5 +3,6 @@
 *.txt
 additional_environment.sh
 __pycache__
+logging
 
 !.gitignore
