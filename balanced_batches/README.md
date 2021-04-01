@@ -1,5 +1,5 @@
 # Creating balanced batches
-The set of scripts in this folders allows to construct training inputs for `DeepTau`,
+The set of scripts in this folderallows to construct training inputs for `DeepTau`,
 which are balanced with respect to a specified phase-space. In that special case we
 balance:
 
