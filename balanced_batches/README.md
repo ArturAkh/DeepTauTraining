@@ -1,6 +1,6 @@
 # Creating balanced batches
 The set of scripts in this folders allows to construct training inputs for `DeepTau`,
-which are balanced with respect to a specified phasespace. In that special case we
+which are balanced with respect to a specified phase-space. In that special case we
 balance:
 
 * per process in an event,
@@ -46,4 +46,4 @@ export X509_USER_PROXY=/path/to/your/grid-proxy.pem
 
 After this, you should be ready to go.
 
-## Number of events in files for each phasespace region to be balanced
+## Number of events in files for each phase-space region to be balanced
