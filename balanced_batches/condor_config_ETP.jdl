@@ -22,6 +22,5 @@ transfer_output_files = ""
 
 use_x509userproxy     = true
 
-max_idle = 2000
 arguments = $(filename)
 queue filename from arguments.txt
