@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import sys
 import os
 import json
 import yaml
@@ -92,9 +93,11 @@ if __name__ == '__main__':
     print(f'Desired number of batches: {n_batches}')
 
     os.makedirs(args.jobconfigs_directory, exist_ok = True)
+    confignames = []
 
     for jobindex in range(n_batches):
-        print(f'Creating job: {jobindex}')
+        sys.stdout.write(f'\rCreating job: {jobindex}')
+        sys.stdout.flush()
         jobdatabase = {'binning' : args.pt_abseta_bins, 'jobindex': jobindex}
         for prockey in filesforselectiondatabase:
             jobdatabase[prockey] = {}
@@ -117,12 +120,19 @@ if __name__ == '__main__':
                         relative_fileindex = absolute_fileindex % n_files
                         tauoffsets[prockey][selection]['tauoffset'] = filesforselectiondatabase[prockey][selection][relative_fileindex]['nevents']  - leftover
                     tauoffsets[prockey][selection]['fileindex'] = relative_fileindex
-        json.dump(jobdatabase, open(os.path.join(args.jobconfigs_directory,f'job_{jobindex}.json'), 'w'), sort_keys=True, indent=4)
+        configname = os.path.join(args.jobconfigs_directory,f'job_{jobindex}.json')
+        json.dump(jobdatabase, open(configname, 'w'), sort_keys=True, indent=4)
+        confignames.append(configname)
 
-    print('Setting required environment variables:')
-    os.environ['BALANCED_BATCHES_CONFIGS'] = args.jobconfigs_directory
-    print(f"\tBALANCED_BATCHES_CONFIGS = {os.environ['BALANCED_BATCHES_CONFIGS']}")
-    os.environ['BALANCED_BATCHES_BATCHSYSTEM'] = args.batch_system
-    print(f"\tBALANCED_BATCHES_BATCHSYSTEM = {os.environ['BALANCED_BATCHES_BATCHSYSTEM']}")
-    os.environ['BALANCED_BATCHES_OUTPUTDIR'] = args.output_directory
-    print(f"\tBALANCED_BATCHES_OUTPUTDIR = {os.environ['BALANCED_BATCHES_OUTPUTDIR']}")
+    print('Saving paths to configuration files in arguments.txt file.')
+    with open('arguments.txt','w') as out:
+        out.write('\n'.join(confignames))
+    print('Saving required environment variables in a .sh file to be sourced.')
+    envcontent = []
+    envcontent.append(f'export BALANCED_BATCHES_BATCHSYSTEM={args.batch_system}')
+    print(f"\tBALANCED_BATCHES_BATCHSYSTEM = {args.batch_system}")
+    envcontent.append(f'export BALANCED_BATCHES_OUTPUTDIR={args.output_directory}')
+    print(f"\tBALANCED_BATCHES_OUTPUTDIR = {args.output_directory}")
+    with open('additional_environment.sh','w') as out:
+        out.write('\n'.join(envcontent))
+        out.close()
