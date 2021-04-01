@@ -40,7 +40,7 @@ cd  DeepTauTraining/balanced_batches
 # Currently (01.04.2021) latest `python3`-based software stack with `ROOT`
 source /cvmfs/sft.cern.ch/lcg/views/LCG_99/x86_64-centos7-gcc10-opt/setup.sh
 
-# assuming you have created one at that path with 'voms-proxy-info'
+# assuming you have created one at that path with 'voms-proxy-init'
 export X509_USER_PROXY=/path/to/your/grid-proxy.pem
 ```
 
