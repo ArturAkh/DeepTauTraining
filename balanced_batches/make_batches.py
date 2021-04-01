@@ -2,7 +2,7 @@ import os
 import sys
 import json
 import datetime
-#import tracemalloc
+from multiprocessing import Process
 
 import ROOT as r
 r.gROOT.SetBatch()
@@ -10,29 +10,35 @@ r.gROOT.ProcessLine('gErrorIgnoreLevel = 2001;')
 
 from utils import create_selections
 
-#tracemalloc.start()
-print('Starting batch creation', datetime.datetime.now())
+def create_output_for_batch_type(fname, selection, files, taurange):
+    df = r.RDataFrame('taus', files)
+    df.Filter(selection).Range(taurange[0], taurange[1]).Snapshot('taus',fname)
 
-jobconfig = sys.argv[1]
+def main():
+    print('Starting batch creation', datetime.datetime.now())
 
-if not os.path.exists(jobconfig):
-    jobconfig = os.path.basename(jobconfig)
-jobconf = json.load(open(jobconfig, 'r'))
+    jobconfig = sys.argv[1]
 
-binningfile = jobconf['binning']
-if not os.path.exists(binningfile):
-    binningfile = os.path.basename(binningfile)
+    if not os.path.exists(jobconfig):
+        jobconfig = os.path.basename(jobconfig)
+    jobconf = json.load(open(jobconfig, 'r'))
 
-selections = create_selections(binningfile)
+    binningfile = jobconf['binning']
+    if not os.path.exists(binningfile):
+        binningfile = os.path.basename(binningfile)
 
-for prockey in [k for k in jobconf if not k in ['binning','jobindex']]:
-    for selname in jobconf[prockey]:
-        fname = '_'.join([prockey,selname,f"batch{jobconf['jobindex']}.root"])
-        #current, peak = tracemalloc.get_traced_memory()
-        #print(f'\tCreating batch {fname}', datetime.datetime.now(), f'memory usage: current={round(current/1024**2,1)}MB, peak={round(peak/1024**2,1)}MB')
-        print(f'\tCreating batch {fname}', datetime.datetime.now())
-        df = r.RDataFrame('taus', jobconf[prockey][selname]['files'])
-        df.Filter(selections[selname]).Range(jobconf[prockey][selname]['range'][0], jobconf[prockey][selname]['range'][1]).Snapshot('taus',fname)
+    selections = create_selections(binningfile)
 
-print('Batch creation finished', datetime.datetime.now())
-#tracemalloc.stop()
+    for prockey in [k for k in jobconf if not k in ['binning','jobindex']]:
+        for selname in jobconf[prockey]:
+            info = {}
+            fname = '_'.join([prockey,selname,f"batch{jobconf['jobindex']}.root"])
+            print(f'\tCreating batch {fname}', datetime.datetime.now())
+            p = Process(target=create_output_for_batch_type, args=(fname, selections[selname], jobconf[prockey][selname]['files'], jobconf[prockey][selname]['range']))
+            p.start()
+            p.join()
+            #create_output_for_batch_type(info)
+
+    print('Batch creation finished', datetime.datetime.now())
+
+if __name__ == '__main__': main()
