@@ -118,3 +118,11 @@ if __name__ == '__main__':
                         tauoffsets[prockey][selection]['tauoffset'] = filesforselectiondatabase[prockey][selection][relative_fileindex]['nevents']  - leftover
                     tauoffsets[prockey][selection]['fileindex'] = relative_fileindex
         json.dump(jobdatabase, open(os.path.join(args.jobconfigs_directory,f'job_{jobindex}.json'), 'w'), sort_keys=True, indent=4)
+
+    print('Setting required environment variables:')
+    os.environ['BALANCED_BATCHES_CONFIGS'] = args.jobconfigs_directory
+    print(f"\tBALANCED_BATCHES_CONFIGS = {os.environ['BALANCED_BATCHES_CONFIGS']}")
+    os.environ['BALANCED_BATCHES_BATCHSYSTEM'] = args.batch_system
+    print(f"\tBALANCED_BATCHES_BATCHSYSTEM = {os.environ['BALANCED_BATCHES_BATCHSYSTEM']}")
+    os.environ['BALANCED_BATCHES_OUTPUTDIR'] = args.output_directory
+    print(f"\tBALANCED_BATCHES_OUTPUTDIR = {os.environ['BALANCED_BATCHES_OUTPUTDIR']}")
