@@ -5,8 +5,8 @@ balance:
 
 * per process in an event,
 * per true type of &tau;<sub>h</sub> candidate,
-* per p<sub>T</sub> slice,
-* and per |&eta;| slice.
+* per p<sub>T</sub>(&tau;<sub>h</sub>) slice,
+* and per |&eta;(&tau;<sub>h</sub>)| slice.
 
 Based on the provided settings, the aim is to achieve a uniform distribution of
 events across the phase-space regions defined for balance above.
