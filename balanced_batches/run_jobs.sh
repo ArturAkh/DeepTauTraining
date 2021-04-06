@@ -8,10 +8,11 @@ OUTPUT=batch${JOBID}.root
 
 source additional_environment.sh
 
-echo "Performing job with configuration ${JOBCONFIG} with job ID ${JOBID}"
+echo "Performing job with configuration ${JOBCONFIG} with job ID ${JOBID}" $(date +"%Y-%M-%d %H:%M:%S.%6N")
 
 ./run_batches.sh ${JOBCONFIG} ${JOBID}
 
-echo "Copying output ${OUTPUT} to destination ${BALANCED_BATCHES_OUTPUTDIR} (overwriting enabled)"
+echo "Copying output" $(date +"%Y-%M-%d %H:%M:%S.%6N")
+echo "Destination: ${BALANCED_BATCHES_OUTPUTDIR}"
 
 ./copy_batches.sh ${OUTPUT} ${BALANCED_BATCHES_OUTPUTDIR}

@@ -9,6 +9,6 @@ JOBID=${JOBID/.json/}
 
 python make_batches.py ${JOBCONFIG}
 
-echo "Merging outputs together"
+echo "Merging outputs together" $(date +"%Y-%M-%d %H:%M:%S.%6N")
 
 hadd -f batch${JOBID}.root *_batch${JOBID}.root
