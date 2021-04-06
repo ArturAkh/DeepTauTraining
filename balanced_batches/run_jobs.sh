@@ -16,3 +16,5 @@ echo "Copying output" $(date +"%Y-%M-%d %H:%M:%S.%6N")
 echo "Destination: ${BALANCED_BATCHES_OUTPUTDIR}"
 
 ./copy_batches.sh ${OUTPUT} ${BALANCED_BATCHES_OUTPUTDIR}
+
+echo "Job finished" $(date +"%Y-%M-%d %H:%M:%S.%6N")
