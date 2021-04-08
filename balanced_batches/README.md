@@ -126,7 +126,7 @@ Within each job, the top-level script `run_jobs.sh` performs the following steps
 * `run_batches.sh`:
   * Sets up the LCG environment stack
   * Runs the `make_batches.py` script with appropriate `job*.json` configuration file
-  * Merges the indivudual outputs to a single balanced batch ROOT file
+  * Merges the individual outputs to a single balanced batch ROOT file
 * `copy_batches.sh`:
   * Sets up a (separate) grid environment
   * copies over the balanced batch ROOT file to the configured output directory
