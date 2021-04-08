@@ -54,7 +54,7 @@ belongs to a certain phase-space region. This task can be covered by the followi
 ```bash
 python create_database.py --prod-campaign prod_Phase2_v2 \
                           --process-types prod_Phase2_v2/process_types.yaml \
-                          --pt-abs-eta-bins prod_Phase2_v2/binning.yaml \
+                          --pt-abseta-bins prod_Phase2_v2/binning.yaml \
                           --input-file-list  prod_Phase2_v2/flist.txt \
                           --replace-file-prefix "/storage/gridka-nrg/@root://cmsxrootd-kit.gridka.de//store/user/" \
                           --recompute-infos
