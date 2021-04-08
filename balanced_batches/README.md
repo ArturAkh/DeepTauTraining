@@ -86,3 +86,26 @@ python create_batchjobs.py --prod-campaign prod_Phase2_v2 \
                            --output-directory "srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only//store/user/aakhmets/TauML/prod_Phase2_v2/balanced_batches/" \
                            --summary-only
 ```
+
+After adapting `prod_Phase2_v2/process_types.yaml`, the command can be executed to create configuration files for each file by neglecting the `--summary-only` option:
+
+```bash
+python create_batchjobs.py --prod-campaign prod_Phase2_v2 \
+                           --process-types prod_Phase2_v2/process_types.yaml \
+                           --pt-abseta-bins prod_Phase2_v2/binning.yaml \
+                           --pileup PU200 \
+                           --events-per-batch-type 15 \
+                           --jobconfigs-directory /ceph/akhmet/balanced_batches_configs/ \
+                           --output-directory "srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only//store/user/aakhmets/TauML/prod_Phase2_v2/balanced_batches/"
+```
+
+The first three options are as used in the previous section. The remaining options have the following meaning:
+
+* `--pileup`: is used to limit the training to a specific PU scenario. Can be ignored by setting to `none`.
+* `--events-per-batch-type`: number of events in a certain phase-space region, that should be included into the balanced batch output file of a job. During the creation of
+the configurarion files, it is taken into account, that in case there are in total less events in a region than requested, then the associated input files will be used multiple
+times. It is also kept track of which files and which events to use for a job by keeping the required file index and event offset to be used for a region. Feel free to have a closer
+look at the script `create_batchjobs.py`. In the current state, the number of balanced batches is computed from maximum number of events in a phase-space region and the requested number
+of events per batch type.
+* `jobconfigs-directory`: output directory for configuration files. Make sure, that you have several GB space there, since all configuration files together can require about 10 GB or more.
+* `--output-directory`: output directory for balanced batches ROOT files. Can be declared as remote (e.g. `srm`) or local, since `gfal-copy` is used for the copy operation.
