@@ -72,7 +72,7 @@ def create_parser(mode=None):
         parser.add_argument('--input-file-list', required=True, help='input TauTuple ROOT files.')
         parser.add_argument('--parallel', type=int, default=10, help= 'Number of parallel processed jobs. Default: %(default)s')
         parser.add_argument('--files-per-job', type=int, default=20, help= 'Number of files to be checked per job. Default: %(default)s')
-        parser.add_argument('--replace-file-prefix', default=':', help='Prefix of file path to be replaced, to be used in the following "<old-prefix>:<new-prefix>". Default: "%(default)s"')
+        parser.add_argument('--replace-file-prefix', default='@', help='Prefix of file path to be replaced, to be used in the following "<old-prefix>@<new-prefix>". Default: "%(default)s"')
         parser.add_argument('--recompute-infos', action='store_true', help='To be used in case .json output files with "counts_job_*.json" are not available yet.')
     elif mode == 'jobdatabase':
         parser.add_argument('--pileup', required=True, choices=['NoPU', 'PU140', 'PU200', 'all', 'none'], help='Which explicit pileup scenarios to be used for training based on balanced batches.')
