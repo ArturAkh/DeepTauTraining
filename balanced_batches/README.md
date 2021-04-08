@@ -65,6 +65,7 @@ phase-space region, which is configured through the files `prod_Phase2_v2/proces
 of the file prefix is done to access the files via XRootD. By default, 20 files per job are processed, with 10 jobs in parallel on a local machine.
 After the outputs of each job, `counts_job_*.json` are prepared (using the option `--recompute-infos`), they summarized into the `counts.json` database.
 
-Feel free to check the available options for the scripts `create_database.py` and `check_inputs.py`.
+Feel free to check the available options for the scripts `create_database.py` and `check_inputs.py`. Beyond, have a look at the `.yaml` configuration files
+and adapt them for your purpose.
 
 ## Constructing database for jobs, which create balanced batches
