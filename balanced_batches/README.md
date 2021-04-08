@@ -69,3 +69,20 @@ Feel free to check the available options for the scripts `create_database.py` an
 and adapt them for your purpose.
 
 ## Constructing database for jobs, which create balanced batches
+
+In the next step, configuration files are created for jobs, which create balanced batches.
+
+At first, only a `summary.json` file is created with the command below, to judge, which &tau;<sub>h</sub> types (`genuine`, `jet`, `electron`, `muon`) to consider for a certain process.
+Its content is the amount of events in total per phase-space region. This allows then to adapt the corresponding configuration in `prod_Phase2_v2/process_types.yaml` in this example with,
+e.g. to avoid `muon` types for `ZPrimeToEE` samples.
+
+```bash
+python create_batchjobs.py --prod-campaign prod_Phase2_v2 \
+                           --process-types prod_Phase2_v2/process_types.yaml \
+                           --pt-abseta-bins prod_Phase2_v2/binning.yaml \
+                           --pileup PU200 \
+                           --events-per-batch-type 15 \
+                           --jobconfigs-directory /ceph/akhmet/balanced_batches_configs/ \
+                           --output-directory "srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/disk-only//store/user/aakhmets/TauML/prod_Phase2_v2/balanced_batches/" \
+                           --summary-only
+```
