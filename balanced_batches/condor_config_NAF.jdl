@@ -1,0 +1,22 @@
+executable = run_jobs.sh
+output                = logging/$(ClusterId).$(ProcId).out
+error                 = logging/$(ClusterId).$(ProcId).err
+log                   = logging/$(ClusterId).$(ProcId).log
+
+getenv                = true
+on_exit_hold = (ExitBySignal == True) || (ExitCode != 0)
+
+requirements = ( OpSysAndVer == "CentOS7" ) 
++RequestRuntime = 172800
+
+RequestDisk = 2000000
+RequestMemory = 2000
+RequestCpus = 1
+
+transfer_input_files = $(filename), prod_Phase2_v2/binning.yaml, make_batches.py, utils.py, copy_batches.sh, run_batches.sh, additional_environment.sh
+transfer_output_files = ""
+
+use_x509userproxy     = true
+
+arguments = $(filename)
+queue filename from arguments.txt
