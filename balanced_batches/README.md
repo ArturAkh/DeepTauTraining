@@ -107,5 +107,43 @@ the configurarion files, it is taken into account, that in case there are in tot
 times. It is also kept track of which files and which events to use for a job by keeping the required file index and event offset to be used for a region. Feel free to have a closer
 look at the script `create_batchjobs.py`. In the current state, the number of balanced batches is computed from maximum number of events in a phase-space region and the requested number
 of events per batch type.
-* `jobconfigs-directory`: output directory for configuration files. Make sure, that you have several GB space there, since all configuration files together can require about 10 GB or more.
-* `--output-directory`: output directory for balanced batches ROOT files. Can be declared as remote (e.g. `srm`) or local, since `gfal-copy` is used for the copy operation.
+* `--jobconfigs-directory`: output directory for configuration files. Make sure, that you have several GB space there, since all configuration files together can require about 10 GB or more.
+* `--output-directory`: output directory for balanced batches ROOT files. Can be declared as remote (e.g. with `srm`) or local, since `gfal-copy` is used for the copy operation.
+
+## Submitting jobs for balanced batches
+
+In the final step, the submission of jobs is performed, using HTCondor configuration files, for example via:
+
+```bash
+condor_submit condor_config_ETP.jdl
+```
+
+This file will use the `arguments.txt` file to pass the configuration file of a job to the top-level script `run_jobs.sh`. In case only a limited amount of jobs is allowed for a user
+on a batch system, feel free to split `arguments.txt` in parts and submit them sequentially.
+
+Within each job, the top-level script `run_jobs.sh` performs the following steps:
+
+* `run_batches.sh`:
+  * Sets up the LCG environment stack
+  * Runs the `make_batches.py` script with appropriate `job*.json` configuration file
+  * Merges the indivudual outputs to a single balanced batch ROOT file
+* `copy_batches.sh`:
+  * Sets up a (separate) grid environment
+  * copies over the balanced batch ROOT file to the configured output directory
+
+To test that workflow locally, you can perform in a **fresh** terminal:
+
+```bash
+./run_jobs.sh `head -n 1 arguments.txt`
+```
+
+Keep in mind, that such a job can take up to 48 hours, so change `make_batches.py` script appropriately, e.g. by putting `break` into the twp `for`-loops, which create the output file at
+the end of the script:
+
+```python
+    for prockey in [k for k in jobconf if not k in ['binning','jobindex']]:
+        for selname in jobconf[prockey]:
+            # ... omitted code ...
+            break
+        break
+```
