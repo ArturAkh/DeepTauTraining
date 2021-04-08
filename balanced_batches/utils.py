@@ -79,4 +79,5 @@ def create_parser(mode=None):
         parser.add_argument('--events-per-batch-type', required=True, type=int, help='Number of events per individual batch-type (process x tautype x ptabsetabin)')
         parser.add_argument('--jobconfigs-directory', required=True, help='Absolute path to the directory, where to put configuration files for each job.')
         parser.add_argument('--output-directory', required=True, help='Path to directory, where the outputs from each job should be transferred. Using "gfal-copy" for that operation, such that remote "root://" and "srm://" paths are also supported.')
+        parser.add_argument('--summary-only', action='store_true', help='To be used in case only the "summary.json" should be created without job configuration files.')
     return parser
