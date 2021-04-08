@@ -137,7 +137,7 @@ To test that workflow locally, you can perform in a **fresh** terminal:
 ./run_jobs.sh `head -n 1 arguments.txt`
 ```
 
-Keep in mind, that such a job can take up to 48 hours, so change `make_batches.py` script appropriately, e.g. by putting `break` into the twp `for`-loops, which create the output file at
+Keep in mind, that such a job can take up to 48 hours, so change `make_batches.py` script appropriately, e.g. by putting `break` into the two `for`-loops, which create the output file at
 the end of the script:
 
 ```python
